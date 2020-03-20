@@ -8,7 +8,7 @@ namespace TextAnalyser
     {
         bool HasNext();
         string MoveNext();
-        //void Reset();
+        void Reset();
 
     }
     interface IterableText
@@ -20,14 +20,16 @@ namespace TextAnalyser
     class FileContent: IterableText
     {
         public string FileName {get; }
-        FileContent (string fileName) => FileName = fileName;
+        public FileContent (string fileName) => FileName = fileName;
         public Iterator CharIterator() => new CharIterator(this);
         public Iterator WordIterator() => new WordIterator(this);
     }
     class CharIterator: Iterator
     {
         protected StreamReader textReader;
-        public CharIterator(FileContent fileContent) => textReader = new StreamReader(fileContent.FileName);
+        protected readonly string path;
+        public CharIterator(FileContent fileContent) => (path, textReader) = 
+        (fileContent.FileName,  new StreamReader(fileContent.FileName));
         ~CharIterator() => textReader.Close();
         public bool HasNext()
         {
@@ -49,18 +51,21 @@ namespace TextAnalyser
         {
             if (HasNext())
             {
-                return textReader.Read().ToString().ToLower();
+                return ((char)textReader.Read()).ToString().ToLower();
             }
             else
             {
                 return "";
             }
         }
-        // public void Reset()
-        // {
-        //     textReader.BaseStream.Position = 0;
-        //     textReader.DiscardBufferedData();
-        // }
+        public void Reset()
+        {
+            textReader.Close();
+            textReader = new StreamReader(path);
+            // Alternative way to reset a stream.
+            // textReader.BaseStream.Position = 0;
+            // textReader.DiscardBufferedData();
+        }
     }
     class WordIterator: CharIterator, Iterator
     {
@@ -73,7 +78,7 @@ namespace TextAnalyser
                 int charInt;
                 do
                 {
-                    word.Append(textReader.Read().ToString().ToLower());
+                    word.Append(((char)textReader.Read()).ToString().ToLower());
                     charInt = textReader.Peek();
                 } while (charInt != -1 && Char.IsLetterOrDigit((char)charInt));
             }

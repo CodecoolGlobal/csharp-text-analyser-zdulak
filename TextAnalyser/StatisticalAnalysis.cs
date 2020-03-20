@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,37 +8,47 @@ namespace TextAnalyser
 {
     class StatisticalAnalysis
     {
-        private Dictionary<string, int> textDict;
+        public ReadOnlyDictionary<string,int> ElementsDictionary {get; }
+        public int Size {get; }
         public StatisticalAnalysis(Iterator iter)
         {
-            textDict = new Dictionary<string, int>();
-            while (iter.HasNext())
+            var tempDict = new Dictionary<string, int>();
+            try
             {
-                string element = iter.MoveNext();
-                if (textDict.ContainsKey(element))
+                while (iter.HasNext())
                 {
-                    ++textDict[element];
-                }
-                else
-                {
-                    textDict.Add(element,1);
+                    string element = iter.MoveNext();
+                    if (tempDict.ContainsKey(element))
+                    {
+                        ++tempDict[element];
+                    }
+                    else
+                    {
+                        tempDict.Add(element,1);
+                    }
                 }
             }
+            catch (IOException ex)
+            {
+                Console.WriteLine("The file could not be read:" + ex.Message);
+            }
+            ElementsDictionary = new ReadOnlyDictionary<string, int>(tempDict);
+            Size = ElementsDictionary.Values.Sum();
         }
-        public int DictionarySize() => textDict.Count;
-        public int Size() => textDict.Values.Sum();
+        public int DictionarySize => ElementsDictionary.Count;
         public int CountOf(params string[] elements)
         {
+            elements = elements.Select(x => x.ToLower()).ToArray();
             int counter = 0;
             foreach (var element in elements)
             {
-                if ( textDict.TryGetValue(element, out int val)) counter += val;
+                if ( ElementsDictionary.TryGetValue(element, out int val)) counter += val;
             }
             return counter;
         }
         public ISet<string> OccurMoreThan(int n)
         {
-            return textDict.Where(kvp => kvp.Value > n).Select(kvp => kvp.Key).ToHashSet();
+            return new SortedSet<string>(ElementsDictionary.Where(kvp => kvp.Value > n).Select(kvp => kvp.Key));
         }
 
     }
