@@ -20,7 +20,7 @@ namespace TextAnalyser
                 Console.WriteLine("Word count: " + wordsAnalysis.Size);
                 Console.WriteLine("Dict size: " + wordsAnalysis.DictionarySize);
                 Console.Write("Most used words (>1%): "); 
-                View.Print(wordsAnalysis.OccurMoreThan(wordsAnalysis.Size/100));
+                View.Print(wordsAnalysis.OccurMoreThan(wordsAnalysis.Size/100+1));
                 Console.WriteLine("'love' count: " + wordsAnalysis.CountOf("love"));
                 Console.WriteLine("'hate' count: " + wordsAnalysis.CountOf("hate"));
                 Console.WriteLine("'music' count: " + wordsAnalysis.CountOf("music"));
