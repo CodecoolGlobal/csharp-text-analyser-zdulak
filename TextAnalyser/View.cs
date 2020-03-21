@@ -3,8 +3,10 @@ using static System.Math;
 using System.Collections.Generic;
 namespace TextAnalyser
 {
+    //TODO: add class description
     static class View
     {
+        //TODO: add method description
         public static void Print<TK,TV> (IReadOnlyDictionary<TK,TV> dict) 
         {
             foreach (var pair in dict)
