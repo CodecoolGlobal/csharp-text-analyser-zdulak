@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 
 namespace TextAnalyser
-{
+{   // FIX: Add "I" to interface name
     interface Iterator
     {
         bool HasNext();
